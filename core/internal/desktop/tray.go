@@ -4,6 +4,7 @@ package desktop
 
 import (
 	"context"
+	"os"
 	"sync"
 	"time"
 	"unicode/utf16"
@@ -11,6 +12,7 @@ import (
 	"github.com/armanlife/arman-vpn-client/core/internal/config"
 	"github.com/armanlife/arman-vpn-client/core/internal/logx"
 	"github.com/armanlife/arman-vpn-client/core/internal/service"
+	"github.com/armanlife/arman-vpn-client/core/internal/update"
 	"github.com/armanlife/arman-vpn-client/core/internal/version"
 
 	"fyne.io/systray"
