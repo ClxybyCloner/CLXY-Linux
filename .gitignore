@@ -1,0 +1,26 @@
+# Build outputs
+dist/
+build/
+bin/
+out/
+
+# Go
+core/clxy-core
+core/clxy-tun
+core/arman-vpn-core
+core/arman-vpn-tun
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+user-data/
+*.token
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

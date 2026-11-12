@@ -1,0 +1,40 @@
+{
+  "name": "clxy-linux",
+  "version": "1.0.0",
+  "description": "CLXY — CLONER X-RAY Linux Desktop Client",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:linux": "electron-builder --linux tar.gz AppImage deb"
+  },
+  "keywords": [
+    "vpn",
+    "clxy",
+    "fastly",
+    "privacy",
+    "socks5",
+    "tun"
+  ],
+  "author": "Cloner X-Ray Team",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.cloner.clxy",
+    "productName": "CLXY",
+    "directories": {
+      "output": "../dist"
+    },
+    "linux": {
+      "target": [
+        "tar.gz",
+        "AppImage",
+        "deb"
+      ],
+      "icon": "assets/logo.png",
+      "category": "Network"
+    }
+  }
+}
