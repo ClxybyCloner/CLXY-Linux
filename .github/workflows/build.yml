@@ -95,7 +95,7 @@ jobs:
           chmod +x dist/clxy-desktop-${{ matrix.arch }}/clxy
 
           cd dist
-          tar -czf CLXY-Linux-${{ matrix.arch }}.tar.gz -C dist/clxy-desktop-${{ matrix.arch }} .
+          tar -czf CLXY-Linux-${{ matrix.arch }}.tar.gz -C clxy-desktop-${{ matrix.arch }} .
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
