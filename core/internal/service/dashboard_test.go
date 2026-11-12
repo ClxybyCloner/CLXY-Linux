@@ -202,7 +202,7 @@ func TestDashboardLoginProtectsAPI(t *testing.T) {
 	if rec := c.do(http.MethodGet, "/api/status", nil); rec.Code != http.StatusUnauthorized {
 		t.Fatalf("expected a login to be required, got %d", rec.Code)
 	}
-	if rec := c.do(http.MethodGet, "/app/", nil); rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), "Arman VPN") {
+	if rec := c.do(http.MethodGet, "/app/", nil); rec.Code != http.StatusOK || (!strings.Contains(rec.Body.String(), "CLXY") && !strings.Contains(rec.Body.String(), "Arman VPN")) {
 		t.Fatalf("expected the page itself to load without a login, got %d", rec.Code)
 	}
 	if rec := c.do(http.MethodGet, "/app", nil); rec.Code/100 != 3 || rec.Header().Get("Location") != "/app/" {

@@ -733,6 +733,10 @@ async function runRelayHealthCheck() {
   }
 }
 
+async function runRelayTest() {
+  return runRelayHealthCheck();
+}
+
 // -------------------------------------------------------------
 // Diagnostics & Live Logs (POST /api/test & SSE /api/logs/stream)
 // -------------------------------------------------------------
