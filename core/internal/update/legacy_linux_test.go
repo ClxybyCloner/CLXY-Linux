@@ -12,9 +12,9 @@ import (
 func TestMigrateFixesTheMenuEntryAndRemovesTheLinks(t *testing.T) {
 	app := t.TempDir()
 	os.MkdirAll(filepath.Join(app, "core"), 0o755)
-	os.WriteFile(filepath.Join(app, "arman-vpn"), []byte("app"), 0o755)
-	os.Symlink("arman-vpn", filepath.Join(app, "firefox-vpn"))
-	os.Symlink("arman-vpn-core", filepath.Join(app, "core", "firefox-vpn-core"))
+	os.WriteFile(filepath.Join(app, "clxy"), []byte("app"), 0o755)
+	os.Symlink("clxy", filepath.Join(app, "firefox-vpn"))
+	os.Symlink("clxy-core", filepath.Join(app, "core", "firefox-vpn-core"))
 	entry := filepath.Join(t.TempDir(), "com.arman.firefoxvpn.desktop")
 	old := desktopFile
 	desktopFile = func() string { return entry }
@@ -25,7 +25,7 @@ func TestMigrateFixesTheMenuEntryAndRemovesTheLinks(t *testing.T) {
 		t.Fatal(err)
 	}
 	data, _ := os.ReadFile(entry)
-	want := "[Desktop Entry]\nName=Arman VPN\nExec=\"" + filepath.Join(app, "arman-vpn") + "\"\nIcon=" + app + "/data/app_icon.png\n"
+	want := "[Desktop Entry]\nName=Arman VPN\nExec=\"" + filepath.Join(app, "clxy") + "\"\nIcon=" + app + "/data/app_icon.png\n"
 	if string(data) != want {
 		t.Fatalf("entry:\n%s\nwant:\n%s", data, want)
 	}
