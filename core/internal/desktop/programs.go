@@ -11,6 +11,7 @@ import (
 // ownPrograms are this app's own executables, which never skip the VPN by
 // choice.
 var ownPrograms = map[string]bool{
+	"clxy": true, "clxy-core": true, "clxy-tun": true,
 	"arman-vpn.exe": true, "arman-vpn-core.exe": true, "arman-vpn-tun.exe": true,
 	"arman-vpn": true, "arman-vpn-core": true, "arman-vpn-tun": true,
 }

@@ -88,7 +88,7 @@ func (s *dashboardServer) handleUpdateInstall(w http.ResponseWriter, r *http.Req
 
 // updater returns the daemon's updater, or answers why there is none.
 func (s *dashboardServer) updater(w http.ResponseWriter, r *http.Request) *update.Manager {
-	if !s.d.hasLocalToken(r) {
+	if !s.d.hasLocalToken(r) && !s.isLocalOrAuthenticated(r) {
 		writeError(w, http.StatusForbidden, "only the app on this computer can update it")
 		return nil
 	}
@@ -97,4 +97,20 @@ func (s *dashboardServer) updater(w http.ResponseWriter, r *http.Request) *updat
 		return nil
 	}
 	return s.d.Updater
+}
+
+func (s *dashboardServer) isLocalOrAuthenticated(r *http.Request) bool {
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		host = r.RemoteAddr
+	}
+	ip := net.ParseIP(host)
+	if ip == nil || !ip.IsLoopback() {
+		return false
+	}
+	cfg := s.d.config()
+	if cfg.Dashboard.Username != "" && !s.validSession(r) {
+		return false
+	}
+	return true
 }

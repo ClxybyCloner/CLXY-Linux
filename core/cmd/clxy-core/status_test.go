@@ -42,7 +42,7 @@ func TestStatusLines(t *testing.T) {
 	none.State.Message = "Add an account in the dashboard to start the proxy"
 	none.Accounts = map[string]int{"total": 0}
 	got = text(none)
-	if !strings.Contains(got, "Proxy: waiting       Add an account") || !strings.Contains(got, "Account: none yet: arman-vpn add-account") {
+	if !strings.Contains(got, "Proxy: waiting       Add an account") || !strings.Contains(got, "Account: none yet: clxy add-account") {
 		t.Errorf("no account:\n%s", got)
 	}
 }

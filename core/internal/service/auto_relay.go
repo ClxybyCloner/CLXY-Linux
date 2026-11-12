@@ -62,7 +62,11 @@ func newAutomaticRelays(n config.Network) *automaticRelays {
 	}
 	// The app and desktop updater already use this local release server in
 	// live tests. Read its manifest too, without publishing test relay URLs.
-	if server := strings.TrimRight(os.Getenv(update.ServerEnv), "/"); server != "" {
+	server := strings.TrimRight(os.Getenv(update.ServerEnv), "/")
+	if server == "" {
+		server = strings.TrimRight(os.Getenv(update.ServerEnvFallback), "/")
+	}
+	if server != "" {
 		a.manifestURLs = []string{server + "/updates.json"}
 	}
 	a.transport = a.workerTransport

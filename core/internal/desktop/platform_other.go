@@ -41,7 +41,7 @@ func notify(title, body string) {
 	if err != nil {
 		return
 	}
-	cmd := exec.Command(path, "--app-name=Arman VPN", "--", title, body)
+	cmd := exec.Command(path, "--app-name=CLXY", "--", title, body)
 	if err := cmd.Start(); err != nil {
 		return
 	}

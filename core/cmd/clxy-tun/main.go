@@ -1,6 +1,6 @@
 //go:generate go run ../../tools/winres -program tun
 
-// Command arman-vpn-tun is the TUN service of the desktop TUN mode: it
+// Command clxy-tun is the TUN service of the desktop TUN mode: it
 // holds the TUN adapter, its routes, and the DNS filters with the system's
 // rights, for the core, which stays an ordinary program (internal/tunservice,
 // protocol internal/tunapi). The app carries it beside the core and
@@ -8,10 +8,10 @@
 // a systemd service in /opt, on macOS as a launchd daemon in
 // /Library/Application Support.
 //
-//	arman-vpn-tun install     install or update the service for this user (asks for administrator rights)
-//	arman-vpn-tun uninstall   remove the service (no prompt while it runs)
-//	arman-vpn-tun update      make the running service this signed executable
-//	arman-vpn-tun -version    print the version
+//	clxy-tun install     install or update the service for this user (asks for administrator rights)
+//	clxy-tun uninstall   remove the service (no prompt while it runs)
+//	clxy-tun update      make the running service this signed executable
+//	clxy-tun -version    print the version
 //
 // On macOS, install and uninstall take -prompt, the reason the
 // administrator prompt shows (the app passes it in the user's language).

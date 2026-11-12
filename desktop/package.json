@@ -1,6 +1,6 @@
 {
   "name": "clxy-linux",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "CLXY — CLONER X-RAY Linux Desktop Client",
   "main": "main.js",
   "scripts": {

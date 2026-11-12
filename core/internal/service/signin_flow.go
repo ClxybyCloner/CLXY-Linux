@@ -493,7 +493,7 @@ func signInFailure(err error) signInProblem {
 	case errors.Is(err, errSignInTokenBlocked):
 		return signInProblem{signInTokenBlocked, "Mozilla did not complete the final step of adding the account (HTTP 406)."}
 	case errors.Is(err, fxa.ErrChallengeBlocked):
-		return signInProblem{signInBlocked, "Mozilla's security check refused this sign-in from here. Sign in with the browser in the Arman VPN app instead."}
+		return signInProblem{signInBlocked, "Mozilla's security check refused this sign-in from here. Sign in with the browser in the CLXY app instead."}
 	case fxa.HTTPStatus(err) == http.StatusTooManyRequests:
 		return signInProblem{signInThrottled, "Too many attempts. Wait a while and try again."}
 	}

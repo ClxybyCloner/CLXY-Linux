@@ -87,6 +87,15 @@
           <span id="statusText" class="text-[12.5px] font-medium text-[#22D3EE]">Connection Secure • TUN</span>
         </div>
 
+        <!-- Update Notification Banner -->
+        <div id="updateBanner" class="hidden w-[90%] mx-auto mb-2 bg-gradient-to-r from-cyan-950/90 to-blue-950/90 border border-cyan-400/50 rounded-xl px-3 py-1.5 flex items-center justify-between shadow-lg shadow-cyan-950/40 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+            <span id="updateBannerText" class="text-cyan-200 font-medium">New update available!</span>
+          </div>
+          <button id="updateBannerBtn" onclick="applyAppUpdate()" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-2 py-0.5 rounded-lg text-[11px] transition">Update</button>
+        </div>
+
         <!-- Active Account Badge -->
         <div id="activeAccountPill" class="text-[11px] text-[#94A3B8] bg-[#0E162E]/70 border border-slate-700/50 rounded-full px-2.5 py-0.5 mb-1.5 cursor-pointer hover:border-cyan-400/50 transition flex items-center gap-1" onclick="switchTab('accounts')">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
@@ -386,7 +395,7 @@
               <input id="cfgRelayUrl" type="text" placeholder="https://relay.example.com/?secret=..." class="clxy-input h-9" />
             </div>
             <button onclick="runRelayHealthCheck()" class="w-full clxy-btn-secondary h-8 text-[11px]">Test Relay Health</button>
-            <div id="relay-test-dialog" class="hidden">CLXY Linux Core (Arman VPN reference)</div>
+            <div id="relay-test-dialog" class="hidden">CLXY Linux Core Relay Diagnostic</div>
           </div>
         </div>
 

@@ -30,7 +30,7 @@ var (
 		if err != nil {
 			return "", err
 		}
-		return filepath.Join(dir, "arman-vpn", "previous-proxy.json"), nil
+		return filepath.Join(dir, "clxy", "previous-proxy.json"), nil
 	}
 )
 

@@ -36,7 +36,7 @@ func TestAccountList(t *testing.T) {
 
 	b.Reset()
 	writeAccountList(&b, paint{}, nil, "", nil, 90, now)
-	if !strings.Contains(b.String(), "No accounts yet. Add one: arman-vpn add-account") {
+	if !strings.Contains(b.String(), "No accounts yet. Add one: clxy add-account") {
 		t.Errorf("empty list:\n%s", b.String())
 	}
 }

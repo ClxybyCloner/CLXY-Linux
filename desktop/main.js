@@ -75,7 +75,8 @@ function createWindow() {
     icon: path.join(__dirname, 'assets', 'logo.png'),
     webPreferences: {
       nodeIntegration: false,
-      contextIsolation: true
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js')
     },
     autoHideMenuBar: true
   });
@@ -123,6 +124,91 @@ function createTray() {
     }
   });
 }
+
+ipcMain.handle('clxy-update-app', async (event, targetVersion) => {
+  console.log('[CLXY Updater] Starting update to version:', targetVersion);
+  return new Promise((resolve, reject) => {
+    const postData = JSON.stringify({ version: targetVersion });
+    const req = http.request({
+      hostname: '127.0.0.1',
+      port: CORE_PORT,
+      path: '/api/update/download',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    }, (res) => {
+      let body = '';
+      res.on('data', chunk => body += chunk);
+      res.on('end', async () => {
+        if (res.statusCode !== 200) {
+          return reject(new Error('Download failed: ' + body));
+        }
+
+        // Poll for ready state
+        let ready = false;
+        for (let i = 0; i < 120; i++) {
+          await new Promise(r => setTimeout(r, 1000));
+          const st = await new Promise((resSt) => {
+            http.get(`http://127.0.0.1:${CORE_PORT}/api/status`, (r) => {
+              let d = '';
+              r.on('data', c => d += c);
+              r.on('end', () => {
+                try { resSt(JSON.parse(d)); } catch (_) { resSt(null); }
+              });
+            }).on('error', () => resSt(null));
+          });
+          if (st && st.update) {
+            if (st.update.state === 'ready') {
+              ready = true;
+              break;
+            } else if (st.update.state === 'failed') {
+              return reject(new Error(st.update.error || 'Update download failed'));
+            }
+          }
+        }
+        if (!ready) {
+          return reject(new Error('Update download timed out'));
+        }
+
+        // Install update passing Electron's PID so updater swaps files smoothly
+        const installData = JSON.stringify({
+          version: targetVersion,
+          pid: process.pid,
+          args: []
+        });
+        const instReq = http.request({
+          hostname: '127.0.0.1',
+          port: CORE_PORT,
+          path: '/api/update/install',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(installData)
+          }
+        }, (instRes) => {
+          if (instRes.statusCode === 200) {
+            console.log('[CLXY Updater] Install scheduled. Quitting Electron to allow replacement...');
+            resolve(true);
+            setTimeout(() => {
+              app.isQuitting = true;
+              app.quit();
+            }, 500);
+          } else {
+            reject(new Error('Install request failed'));
+          }
+        });
+        instReq.on('error', reject);
+        instReq.write(installData);
+        instReq.end();
+      });
+    });
+    req.on('error', reject);
+    req.write(postData);
+    req.end();
+  });
+});
 
 app.whenReady().then(async () => {
   await startCoreIfNeeded();

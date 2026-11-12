@@ -115,13 +115,16 @@ func AppDir(exe string) string {
 
 // releasesURL is where GitHub serves a release's files:
 // <releasesURL>v<version>/<file>.
-const releasesURL = "https://github.com/armanlife/arman-vpn-client/releases/download/"
+const releasesURL = "https://github.com/ClxybyCloner/CLXY-Linux/releases/download/"
 
 // ServerEnv names a release server to use instead of GitHub, for trying
 // updates with a local test release: it serves
 // <server>/releases/download/v<version>/<file>. A loopback server is
 // reached directly.
-const ServerEnv = "ARMAN_VPN_UPDATE_SERVER"
+const (
+	ServerEnv         = "CLXY_UPDATE_SERVER"
+	ServerEnvFallback = "ARMAN_VPN_UPDATE_SERVER"
+)
 
 // Size limits of what a download reads.
 const (
@@ -268,7 +271,11 @@ func HasApp(appDir string) bool {
 // it is.
 func New(opts Options) *Manager {
 	m := &Manager{opts: opts, dir: filepath.Join(opts.DataDir, "update"), baseURL: releasesURL, status: Status{State: StateIdle}}
-	if server := strings.TrimRight(os.Getenv(ServerEnv), "/"); server != "" {
+	server := strings.TrimRight(os.Getenv(ServerEnv), "/")
+	if server == "" {
+		server = strings.TrimRight(os.Getenv(ServerEnvFallback), "/")
+	}
+	if server != "" {
 		m.baseURL = server + "/releases/download/"
 		if u, err := url.Parse(server); err == nil {
 			if ip := net.ParseIP(u.Hostname()); u.Hostname() == "localhost" || (ip != nil && ip.IsLoopback()) {
@@ -719,7 +726,10 @@ func (m *Manager) Install(req InstallRequest) error {
 		}
 	}
 	if req.PID <= 0 {
-		return errors.New("the app's process id is missing")
+		req.PID = os.Getppid()
+		if req.PID <= 0 {
+			req.PID = os.Getpid()
+		}
 	}
 	m.mu.Lock()
 	if m.status.State != StateReady || m.status.Version != req.Version {

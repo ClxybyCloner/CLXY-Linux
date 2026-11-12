@@ -101,7 +101,7 @@ func ReportAppError(w io.Writer, err error) int {
 	f := classifyAppError(err)
 	fmt.Fprintf(w, "%s%s %s\n", appErrorPrefix, f.code, oneLine(f.detail))
 	if f.code == AppErrorAlreadyRunning {
-		fmt.Fprintf(w, "arman-vpn-core: %s\n", oneLine(err.Error()))
+		fmt.Fprintf(w, "clxy-core: %s\n", oneLine(err.Error()))
 	}
 	return f.exit
 }

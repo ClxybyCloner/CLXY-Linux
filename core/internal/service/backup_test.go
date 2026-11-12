@@ -19,7 +19,7 @@ import (
 func TestBackupNamesIncludeLocalTimeAndDifferWithinADay(t *testing.T) {
 	now := time.Date(2026, 11, 9, 20, 45, 8, 0, time.FixedZone("local", 3*3600+30*60))
 	first := backupFileName(now)
-	if first != "Arman-VPN-backup-2026-11-09_20-45-08.zip" {
+	if first != "CLXY-backup-2026-11-09_20-45-08.zip" {
 		t.Fatalf("unexpected backup name: %s", first)
 	}
 	if first == backupFileName(now.Add(time.Second)) {
@@ -237,7 +237,7 @@ func TestBackupAPI(t *testing.T) {
 	c := newDashboardClient(t, from)
 	rec := c.do(http.MethodGet, "/api/backup", nil)
 	if rec.Code != http.StatusOK || rec.Header().Get("Content-Type") != "application/zip" ||
-		!strings.Contains(rec.Header().Get("Content-Disposition"), "Arman-VPN-backup-") {
+		!strings.Contains(rec.Header().Get("Content-Disposition"), "CLXY-backup-") {
 		t.Fatalf("export: %d %v", rec.Code, rec.Header())
 	}
 	data := rec.Body.Bytes()

@@ -82,6 +82,7 @@ async function fetchCoreStatus() {
     const state = data.state || {};
     appState.phase = state.phase || 'off';
     appState.running = (appState.phase === 'running');
+    appState.version = data.version || '1.0.1';
 
     // Timer calculation
     if (appState.running && state.since) {
@@ -827,10 +828,119 @@ function showToast(msg) {
 }
 
 // -------------------------------------------------------------
+// Auto-Updater & Version Discovery
+// -------------------------------------------------------------
+let latestReleaseVersion = null;
+
+function compareVersions(v1, v2) {
+  const p1 = (v1 || '').replace(/^v/, '').split('.').map(Number);
+  const p2 = (v2 || '').replace(/^v/, '').split('.').map(Number);
+  for (let i = 0; i < Math.max(p1.length, p2.length); i++) {
+    const num1 = p1[i] || 0;
+    const num2 = p2[i] || 0;
+    if (num1 > num2) return 1;
+    if (num1 < num2) return -1;
+  }
+  return 0;
+}
+
+async function checkForAppUpdate() {
+  try {
+    let latestVer = null;
+    try {
+      const res = await fetch('https://api.github.com/repos/ClxybyCloner/CLXY-Linux/releases/latest');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.tag_name) {
+          latestVer = data.tag_name.replace(/^v/, '');
+        }
+      }
+    } catch (_) {}
+
+    if (!latestVer) {
+      try {
+        const res = await fetch('https://raw.githubusercontent.com/ClxybyCloner/CLXY-Linux/main/version.txt');
+        if (res.ok) {
+          latestVer = (await res.text()).trim().replace(/^v/, '');
+        }
+      } catch (_) {}
+    }
+
+    if (!latestVer) return;
+
+    const currentVer = appState.version || '1.0.1';
+    if (compareVersions(latestVer, currentVer) > 0) {
+      latestReleaseVersion = latestVer;
+      const banner = document.getElementById('updateBanner');
+      const text = document.getElementById('updateBannerText');
+      if (banner && text) {
+        text.textContent = `New update available: v${latestVer}`;
+        banner.classList.remove('hidden');
+      }
+    }
+  } catch (_) {
+    // Ignore network errors quietly
+  }
+}
+
+async function applyAppUpdate() {
+  if (!latestReleaseVersion) return;
+  const btn = document.getElementById('updateBannerBtn');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Updating...';
+  }
+
+  showToast(`Downloading update v${latestReleaseVersion}...`);
+
+  try {
+    if (window.electronAPI && typeof window.electronAPI.triggerUpdate === 'function') {
+      await window.electronAPI.triggerUpdate(latestReleaseVersion);
+      showToast('Update ready. Restarting application...');
+      return;
+    }
+
+    // Direct dashboard update flow
+    await api('POST', '/update/download', { version: latestReleaseVersion });
+
+    // Poll status until ready
+    for (let i = 0; i < 120; i++) {
+      await new Promise(r => setTimeout(r, 1000));
+      const st = await api('GET', '/status');
+      if (st && st.update) {
+        if (st.update.state === 'ready') {
+          break;
+        } else if (st.update.state === 'failed') {
+          throw new Error(st.update.error || 'Update download failed');
+        }
+      }
+    }
+
+    showToast('Installing update...');
+    await api('POST', '/update/install', {
+      version: latestReleaseVersion,
+      pid: 0,
+      args: []
+    });
+
+    showToast('Update applied! CLXY is restarting...');
+    if (btn) btn.textContent = 'Restarting...';
+  } catch (err) {
+    showToast(`Update failed: ${err.message}`);
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Retry Update';
+    }
+  }
+}
+
+// -------------------------------------------------------------
 // Initialization
 // -------------------------------------------------------------
 window.addEventListener('DOMContentLoaded', () => {
   fetchCoreStatus();
   setInterval(fetchCoreStatus, 2000);
   initLogStream();
+  setTimeout(checkForAppUpdate, 3000);
+  setInterval(checkForAppUpdate, 4 * 60 * 60 * 1000);
 });

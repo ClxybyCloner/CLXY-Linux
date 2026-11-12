@@ -13,13 +13,13 @@ import (
 	"strings"
 )
 
-// linuxPackage is the Linux app's tar.gz for this processor
-// (scripts/build-linux.sh): an arman-vpn folder with the app, its lib/ and
-// data/, and core/.
+// linuxPackage is the Linux app's tar.gz for this processor:
+// a clxy folder (or top-level bundle) with the app launcher clxy,
+// desktop files, and core/clxy-core.
 var linuxPackage = appPackage{
-	name:   func(v string) string { return "Arman-VPN-" + v + "-Linux-" + runtime.GOARCH + ".tar.gz" },
-	app:    "arman-vpn",
-	core:   "core/arman-vpn-core",
+	name:   func(v string) string { return "CLXY-Linux-" + runtime.GOARCH + ".tar.gz" },
+	app:    "clxy",
+	core:   "core/clxy-core",
 	unpack: untar,
 }
 

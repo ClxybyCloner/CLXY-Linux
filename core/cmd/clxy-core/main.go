@@ -36,7 +36,7 @@ func main() {
 		fmt.Fprintln(out)
 		flag.PrintDefaults()
 	}
-	dataDir := flag.String("data-dir", "", "Data folder (default: the desktop app's folder when the core sits beside arman-vpn(.exe), else the \"user-data\" folder next to the executable)")
+	dataDir := flag.String("data-dir", "", "Data folder (default: the desktop app's folder when the core sits beside clxy, else the \"user-data\" folder next to the executable)")
 	addAccount := flag.Bool("add-account", false, "Sign in on the terminal and add the account, then exit")
 	listAccounts := flag.Bool("list-accounts", false, "List the accounts with status and quota, then exit")
 	status := flag.Bool("status", false, "Print the running service's proxy state, account, and data left in a few lines, then exit")
@@ -176,10 +176,10 @@ func runCommand(opts commandOptions) error {
 
 // appInTerminalHint tells someone who typed -app what that mode is for: it
 // waits for the desktop app to turn the proxy on.
-const appInTerminalHint = `arman-vpn-core: -app is the desktop app's mode: the proxy stays off until the
+const appInTerminalHint = `clxy-core: -app is the desktop app's mode: the proxy stays off until the
 app or the panel's power button turns it on, the log goes to user-data/logs
 only, and closing this terminal stops it. In a terminal or as a service, run
-arman-vpn-core without -app: the proxy is on from the start (-plain prints
+clxy-core without -app: the proxy is on from the start (-plain prints
 the log).`
 
 // runConsole runs the service in the terminal until Ctrl+C or SIGTERM.

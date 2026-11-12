@@ -177,7 +177,7 @@ func TestReportAppError(t *testing.T) {
 			exit: ExitAlreadyRunning,
 			want: []string{
 				"app-error: already_running " + dir,
-				"arman-vpn-core: " + ErrAlreadyRunning.Error() + " (" + dir + "): a tray icon runs for it",
+				"clxy-core: " + ErrAlreadyRunning.Error() + " (" + dir + "): a tray icon runs for it",
 			},
 		},
 		"dashboard port in use": {

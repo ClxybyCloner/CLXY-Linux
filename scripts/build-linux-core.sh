@@ -8,7 +8,8 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-VERSION="${APP_VERSION:-1.0.0}"
+VERSION="${APP_VERSION:-1.0.1}"
+SIGNING_KEY="${SIGNING_KEY:-mOwtyhaqwSRrs24YjOMBk1AI4mySdZTYv8tjB+OoNAg=}"
 
 echo "Building CLXY Linux Core v$VERSION..."
 mkdir -p "$ROOT/dist"
@@ -20,12 +21,12 @@ for arch in amd64 arm64; do
 
   echo "Compiling clxy-core ($arch)..."
   (cd "$ROOT/core" && CGO_ENABLED=0 GOOS=linux GOARCH="$arch" go build -trimpath \
-    -ldflags "-s -w -X github.com/armanlife/arman-vpn-client/core/internal/version.Current=$VERSION" \
+    -ldflags "-s -w -X github.com/armanlife/arman-vpn-client/core/internal/version.Current=$VERSION -X github.com/armanlife/arman-vpn-client/core/internal/signing.Key=$SIGNING_KEY" \
     -o "$stage/$name/clxy-core" ./cmd/clxy-core)
 
   echo "Compiling clxy-tun ($arch)..."
   (cd "$ROOT/core" && CGO_ENABLED=0 GOOS=linux GOARCH="$arch" go build -tags with_gvisor -trimpath \
-    -ldflags "-s -w -X github.com/armanlife/arman-vpn-client/core/internal/version.Current=$VERSION" \
+    -ldflags "-s -w -X github.com/armanlife/arman-vpn-client/core/internal/version.Current=$VERSION -X github.com/armanlife/arman-vpn-client/core/internal/signing.Key=$SIGNING_KEY" \
     -o "$stage/$name/clxy-tun" ./cmd/clxy-tun)
 
   install -m 0755 "$ROOT/core/scripts/install-systemd.sh" "$stage/$name/install-systemd.sh"

@@ -157,9 +157,9 @@ func TestALinuxReleaseInstalls(t *testing.T) {
 	t.Cleanup(func() { thePackage = windowsPackage })
 	r := newRelease(t, "1.2.3")
 	r.files[AssetName("1.2.3")] = appTar(t,
-		tarExe("arman-vpn/arman-vpn", "app 1.2.3"),
-		tarExe("arman-vpn/core/arman-vpn-core", "core 1.2.3"),
-		tarExe("arman-vpn/core/arman-vpn-tun", "tun 1.2.3"),
+		tarExe("clxy", "app 1.2.3"),
+		tarExe("core/clxy-core", "core 1.2.3"),
+		tarExe("core/clxy-tun", "tun 1.2.3"),
 	)
 	r.sign()
 	r.serve(t)
@@ -167,9 +167,9 @@ func TestALinuxReleaseInstalls(t *testing.T) {
 		t.Fatalf("asset %s", AssetName("1.2.3"))
 	}
 	appDir, dataDir := appFolder(t, "1.0.0", false)
-	write(t, filepath.Join(appDir, "arman-vpn"), "app 1.0.0")
+	write(t, filepath.Join(appDir, "clxy"), "app 1.0.0")
 	p := installed(t, appDir, dataDir)
-	if read(t, filepath.Join(p.Package, "core", "arman-vpn-core")) != "core 1.2.3" || read(t, filepath.Join(p.Package, "arman-vpn")) != "app 1.2.3" {
+	if read(t, filepath.Join(p.Package, "core", "clxy-core")) != "core 1.2.3" || read(t, filepath.Join(p.Package, "clxy")) != "app 1.2.3" {
 		t.Fatalf("unpacked into %s", p.Package)
 	}
 }
@@ -214,7 +214,7 @@ func TestAppDirIsTheFolderThatHoldsTheCore(t *testing.T) {
 		exe, want string
 	}{
 		{windowsPackage, "/Users/a/Arman VPN/core/arman-vpn-core.exe", "/Users/a/Arman VPN"},
-		{linuxPackage, "/home/a/.local/opt/arman-vpn/core/arman-vpn-core", "/home/a/.local/opt/arman-vpn"},
+		{linuxPackage, "/home/a/.local/opt/clxy/core/clxy-core", "/home/a/.local/opt/clxy"},
 		{macPackage, "/Applications/Arman VPN.app/Contents/MacOS/arman-vpn-core", "/Applications/Arman VPN.app"},
 	} {
 		thePackage = c.pkg

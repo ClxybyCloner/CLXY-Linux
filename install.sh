@@ -76,22 +76,72 @@ echo -e "Target mode: ${CYAN}${MODE}${OFF}"
 STAGE="$(mktemp -d)"
 trap 'rm -rf "$STAGE"' EXIT
 
+verify_package() {
+  local tar_file="$1"
+  local is_local="$2"
+  local sums_file="$STAGE/SHA256SUMS.txt"
+
+  if [ "$is_local" -eq 0 ]; then
+    echo "Downloading SHA256SUMS.txt from ${BASE_URL}/SHA256SUMS.txt..."
+    if ! curl -fsSL "${BASE_URL}/SHA256SUMS.txt" -o "$sums_file"; then
+      echo -e "${RED}Error: Failed to download SHA256SUMS.txt from ${BASE_URL}/SHA256SUMS.txt${OFF}" >&2
+      exit 1
+    fi
+  else
+    if [ -f "dist/SHA256SUMS.txt" ]; then
+      cp "dist/SHA256SUMS.txt" "$sums_file"
+    elif [ -f "SHA256SUMS.txt" ]; then
+      cp "SHA256SUMS.txt" "$sums_file"
+    fi
+  fi
+
+  if [ ! -f "$sums_file" ]; then
+    if [ "$is_local" -eq 1 ]; then
+      echo -e "${YELLOW}Warning: No SHA256SUMS.txt available for local package ${tar_file}. Continuing without verification.${OFF}"
+      return 0
+    else
+      echo -e "${RED}Error: Checksum file SHA256SUMS.txt is missing.${OFF}" >&2
+      exit 1
+    fi
+  fi
+
+  echo "Verifying SHA256 checksum for ${tar_file}..."
+  local check_file="$STAGE/check_${tar_file}.txt"
+  grep -E "[[:space:]]\*?${tar_file}\$" "$sums_file" > "$check_file" || true
+
+  if [ ! -s "$check_file" ]; then
+    echo -e "${RED}Error: No checksum entry found for ${tar_file} in SHA256SUMS.txt.${OFF}" >&2
+    exit 1
+  fi
+
+  if ! (cd "$STAGE" && sha256sum -c "$check_file" >/dev/null 2>&1); then
+    echo -e "${RED}Error: SHA256 checksum verification failed for ${tar_file}! Installation aborted.${OFF}" >&2
+    exit 1
+  fi
+
+  echo -e "${GREEN}✓ SHA256 checksum verified for ${tar_file}.${OFF}"
+}
+
 if [ "$MODE" = "server" ]; then
   echo -e "\n${BOLD}Installing CLXY Linux Core Service...${OFF}"
   
   CORE_TAR="clxy-core-linux-${GOARCH}.tar.gz"
   DOWNLOAD_URL="${BASE_URL}/${CORE_TAR}"
+  IS_LOCAL=0
   
   echo "Downloading $DOWNLOAD_URL..."
   if ! curl -fsSL "$DOWNLOAD_URL" -o "$STAGE/$CORE_TAR"; then
     echo -e "${YELLOW}Release package not found on CDN. Building or falling back to local bundle...${OFF}"
     if [ -f "dist/$CORE_TAR" ]; then
       cp "dist/$CORE_TAR" "$STAGE/$CORE_TAR"
+      IS_LOCAL=1
     else
       echo -e "${RED}Failed to download $CORE_TAR${OFF}" >&2
       exit 1
     fi
   fi
+  
+  verify_package "$CORE_TAR" "$IS_LOCAL"
   
   tar -xzf "$STAGE/$CORE_TAR" -C "$STAGE"
   
@@ -113,17 +163,21 @@ else
   
   APP_TAR="CLXY-Linux-${GOARCH}.tar.gz"
   DOWNLOAD_URL="${BASE_URL}/${APP_TAR}"
+  IS_LOCAL=0
   
   echo "Downloading $DOWNLOAD_URL..."
   if ! curl -fsSL "$DOWNLOAD_URL" -o "$STAGE/$APP_TAR"; then
     echo -e "${YELLOW}Release package not found on CDN. Falling back to local dist...${OFF}"
     if [ -f "dist/$APP_TAR" ]; then
       cp "dist/$APP_TAR" "$STAGE/$APP_TAR"
+      IS_LOCAL=1
     else
       echo -e "${RED}Failed to download $APP_TAR${OFF}" >&2
       exit 1
     fi
   fi
+
+  verify_package "$APP_TAR" "$IS_LOCAL"
 
   USER_OPT="$HOME/.local/opt/clxy"
   mkdir -p "$USER_OPT"
